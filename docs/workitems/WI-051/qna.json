@@ -2,7 +2,7 @@
   "entity_type": "workItem",
   "entity_id": "WI-051",
   "assigned_to": "Pua6ezZowteUtW37dndRPa890B93",
-  "status": "pending",
+  "status": "completed",
   "questions": [
     {
       "id": "q1",
@@ -10,9 +10,10 @@
       "text": "What is the configured resume file-size limit (for example in MB)?",
       "reason": "REQ-429 lists it as open. It sets the upload validation and the error message.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "5 MB",
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-22T15:27:52.000Z",
+      "other": null
     },
     {
       "id": "q2",
@@ -25,9 +26,10 @@
       ],
       "reason": "REQ-429 says the original file is stored outside the database, and the source allows local storage only in development. Production storage changes the plan.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Controlled local storage on the server",
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-22T15:27:52.000Z",
+      "other": null
     },
     {
       "id": "q3",
@@ -39,9 +41,10 @@
       ],
       "reason": "REQ-429 lists it as open. It decides the data model and whether replace deletes the old file.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Yes, one resume; replace overwrites it",
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-22T15:27:52.000Z",
+      "other": null
     },
     {
       "id": "q4",
@@ -49,9 +52,10 @@
       "text": "What is the retention period for a resume and its extracted text after a delete is requested?",
       "reason": "REQ-429 lists it as open. Delete is not in the acceptance criteria, so it can wait if the work item excludes it.",
       "required": false,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Permanently delete the original resume file and extracted text within 30 days after a delete request.",
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-22T15:27:52.000Z",
+      "other": null
     }
   ]
 }
