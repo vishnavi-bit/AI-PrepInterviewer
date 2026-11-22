@@ -2,7 +2,7 @@
   "entity_type": "workItem",
   "entity_id": "WI-050",
   "assigned_to": "Pua6ezZowteUtW37dndRPa890B93",
-  "status": "pending",
+  "status": "completed",
   "questions": [
     {
       "id": "q1",
@@ -16,9 +16,13 @@
       ],
       "reason": "The source document does not list the registration fields; they determine the user table and the registration form.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": [
+        "Name",
+        "Email"
+      ],
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-22T15:20:39.000Z",
+      "other": null
     },
     {
       "id": "q2",
@@ -30,9 +34,10 @@
       ],
       "reason": "The login page shows an Email/username field, but the choice decides which field is unique and indexed in the user table.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Email",
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-22T15:20:39.000Z",
+      "other": null
     },
     {
       "id": "q3",
@@ -48,9 +53,15 @@
       ],
       "reason": "The source only says basic profile information; the list sets the profile columns and the Save form.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": [
+        "Name",
+        "Password",
+        "Avatar",
+        "Target role"
+      ],
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-22T15:20:39.000Z",
+      "other": null
     },
     {
       "id": "q4",
@@ -62,9 +73,10 @@
       ],
       "reason": "The source requires secure password hashing without naming an algorithm; this is a security choice that affects the dependencies.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "argon2id (Recommended)",
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-22T15:20:39.000Z",
+      "other": null
     }
   ]
 }
