@@ -2,7 +2,7 @@
   "entity_type": "workItem",
   "entity_id": "WI-054",
   "assigned_to": "Pua6ezZowteUtW37dndRPa890B93",
-  "status": "pending",
+  "status": "completed",
   "questions": [
     {
       "id": "q1",
@@ -15,9 +15,10 @@
       ],
       "reason": "REQ-431 leaves this open. It sets the limit the api returns and the number of options the page renders.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "5",
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-22T16:10:50.000Z",
+      "other": null
     },
     {
       "id": "q2",
@@ -29,9 +30,10 @@
       ],
       "reason": "REQ-431 leaves this open. A fixed list means a role catalogue and rule-based matching in the api; an open list means generating roles from the resume, which changes the design of the recommendation service.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Open - roles generated from the resume",
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-22T16:10:50.000Z",
+      "other": null
     }
   ]
 }
