@@ -1,0 +1,70 @@
+{
+  "entity_type": "workItem",
+  "entity_id": "WI-050",
+  "assigned_to": "Pua6ezZowteUtW37dndRPa890B93",
+  "status": "pending",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multi_choice",
+      "text": "Which account details are required at registration?",
+      "options": [
+        "Name",
+        "Email",
+        "Password",
+        "Username"
+      ],
+      "reason": "The source document does not list the registration fields; they determine the user table and the registration form.",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    },
+    {
+      "id": "q2",
+      "type": "single_choice",
+      "text": "Is login by email or by username?",
+      "options": [
+        "Email",
+        "Username"
+      ],
+      "reason": "The login page shows an Email/username field, but the choice decides which field is unique and indexed in the user table.",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    },
+    {
+      "id": "q3",
+      "type": "multi_choice",
+      "text": "Which profile fields can the candidate update?",
+      "options": [
+        "Name",
+        "Email",
+        "Password",
+        "Avatar",
+        "Target role",
+        "Other (describe in the Q&A)"
+      ],
+      "reason": "The source only says basic profile information; the list sets the profile columns and the Save form.",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    },
+    {
+      "id": "q4",
+      "type": "single_choice",
+      "text": "Which password hashing algorithm should be used?",
+      "options": [
+        "argon2id (Recommended)",
+        "bcrypt"
+      ],
+      "reason": "The source requires secure password hashing without naming an algorithm; this is a security choice that affects the dependencies.",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    }
+  ]
+}
