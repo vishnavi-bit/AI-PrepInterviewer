@@ -1,0 +1,42 @@
+{
+  "entity_type": "workItem",
+  "entity_id": "WI-053",
+  "assigned_to": "Pua6ezZowteUtW37dndRPa890B93",
+  "status": "pending",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "text",
+      "text": "What JSON structure should the Gemini resume analysis use? The source names the categories (skills, education, projects, experience, internships, certifications, technologies) but no schema.",
+      "reason": "The backend validation, the stored shape and the review page all depend on the response schema. Without it the implementation would have to invent one.",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    },
+    {
+      "id": "q2",
+      "type": "single_choice",
+      "text": "Are the candidate's corrections stored separately from the AI output, or does the corrected version replace the AI output?",
+      "options": [
+        "Store separately (keep the AI output and the candidate's corrections)",
+        "Replace the AI output with the candidate's corrected version"
+      ],
+      "reason": "This decides the data model and whether the original analysis can be shown or compared later.",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    },
+    {
+      "id": "q3",
+      "type": "text",
+      "text": "What message should the candidate see when Gemini is unavailable or returns an invalid or incomplete response?",
+      "reason": "The source requires an understandable error but gives no wording. A default message will be used if left empty.",
+      "required": false,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    }
+  ]
+}
