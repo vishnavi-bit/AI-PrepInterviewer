@@ -1,0 +1,57 @@
+{
+  "entity_type": "workItem",
+  "entity_id": "WI-051",
+  "assigned_to": "Pua6ezZowteUtW37dndRPa890B93",
+  "status": "pending",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "text",
+      "text": "What is the configured resume file-size limit (for example in MB)?",
+      "reason": "REQ-429 lists it as open. It sets the upload validation and the error message.",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    },
+    {
+      "id": "q2",
+      "type": "single_choice",
+      "text": "Where is the original resume file stored in production?",
+      "options": [
+        "Object storage (for example S3 or Cloudflare R2)",
+        "Controlled local storage on the server",
+        "Other (describe in the answer)"
+      ],
+      "reason": "REQ-429 says the original file is stored outside the database, and the source allows local storage only in development. Production storage changes the plan.",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    },
+    {
+      "id": "q3",
+      "type": "single_choice",
+      "text": "Does a candidate keep only one resume at a time, with replace overwriting it?",
+      "options": [
+        "Yes, one resume; replace overwrites it",
+        "No, keep older versions"
+      ],
+      "reason": "REQ-429 lists it as open. It decides the data model and whether replace deletes the old file.",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    },
+    {
+      "id": "q4",
+      "type": "text",
+      "text": "What is the retention period for a resume and its extracted text after a delete is requested?",
+      "reason": "REQ-429 lists it as open. Delete is not in the acceptance criteria, so it can wait if the work item excludes it.",
+      "required": false,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    }
+  ]
+}
