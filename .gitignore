@@ -1,0 +1,11 @@
+# KNM
+.claude/requirements.json
+.knm/
+
+# Secrets and credentials (never commit)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.claude/settings.local.json
