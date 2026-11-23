@@ -4,3 +4,5 @@ python-multipart
 argon2-cffi
 httpx
 pytest
+pypdf==7.1.1
+python-docx==1.2.0

@@ -1,9 +1,13 @@
 import { Link, Navigate, Route, Routes } from "react-router-dom";
 import { RequireAuth } from "./components/RequireAuth";
 import { useAuth } from "./context/AuthContext";
+import { InterviewConfigurationPage } from "./pages/InterviewConfiguration";
+import { InterviewRoomPage } from "./pages/InterviewRoom";
 import { Login } from "./pages/Login";
 import { Profile } from "./pages/Profile";
 import { Register } from "./pages/Register";
+import { Resume } from "./pages/Resume";
+import { RoleRecommendation } from "./pages/RoleRecommendation";
 
 export default function App() {
   const { user } = useAuth();
@@ -16,7 +20,13 @@ export default function App() {
         </Link>
         <nav>
           {user ? (
-            <Link to="/profile">Profile</Link>
+            <>
+              <Link to="/resume">Resume</Link>
+              <Link to="/roles">Job roles</Link>
+              <Link to="/interview">Interview setup</Link>
+              <Link to="/interview/room">Interview room</Link>
+              <Link to="/profile">Profile</Link>
+            </>
           ) : (
             <>
               <Link to="/login">Log in</Link>
@@ -36,6 +46,38 @@ export default function App() {
             element={
               <RequireAuth>
                 <Profile />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/resume"
+            element={
+              <RequireAuth>
+                <Resume />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/roles"
+            element={
+              <RequireAuth>
+                <RoleRecommendation />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/interview"
+            element={
+              <RequireAuth>
+                <InterviewConfigurationPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/interview/room"
+            element={
+              <RequireAuth>
+                <InterviewRoomPage />
               </RequireAuth>
             }
           />
