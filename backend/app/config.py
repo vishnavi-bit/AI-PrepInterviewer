@@ -35,7 +35,22 @@ def _parse_minutes(raw: str) -> tuple[int, ...]:
     return tuple(int(part) for part in (p.strip() for p in raw.split(",")) if part)
 
 
+def load_dotenv(path: Path) -> None:
+    """Fill in variables from a .env file. Variables already set in the environment win."""
+    if not path.is_file():
+        return
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        if key and key not in os.environ:
+            os.environ[key] = value.strip().strip('"').strip("'")
+
+
 def load_settings() -> Settings:
+    load_dotenv(BACKEND_DIR / ".env")
     uploads_dir = Path(os.getenv("UPLOADS_DIR", str(BACKEND_DIR / "uploads")))
     return Settings(
         turso_url=os.getenv("TURSO_DATABASE_URL") or None,
