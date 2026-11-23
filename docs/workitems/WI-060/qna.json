@@ -1,0 +1,38 @@
+{
+  "entity_type": "workItem",
+  "entity_id": "WI-060",
+  "assigned_to": "Pua6ezZowteUtW37dndRPa890B93",
+  "status": "pending",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "text",
+      "text": "What retention period applies to resumes, transcripts and reports before they are deleted?",
+      "reason": "REQ-437 requires documented deletion rules but gives no durations. The deletion rules and the delete job cannot be implemented without them.",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    },
+    {
+      "id": "q2",
+      "type": "text",
+      "text": "Which logging tool or format should the backend use?",
+      "reason": "REQ-437 open question. Needed to decide how logs are written and how secrets are redacted in them.",
+      "required": false,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    },
+    {
+      "id": "q3",
+      "type": "text",
+      "text": "Is the hosting target decided, and is HTTPS terminated there?",
+      "reason": "REQ-437 open question. The source says 'use HTTPS in deployment', which affects secure cookie and CORS settings.",
+      "required": false,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    }
+  ]
+}
