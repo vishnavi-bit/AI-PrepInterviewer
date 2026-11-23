@@ -1,0 +1,50 @@
+{
+  "entity_type": "workItem",
+  "entity_id": "WI-057",
+  "assigned_to": "Pua6ezZowteUtW37dndRPa890B93",
+  "status": "pending",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "single_choice",
+      "text": "How is speech handled: browser speech (Web Speech API, no backend) or a speech provider called through the API?",
+      "options": [
+        "Browser speech only (web app)",
+        "Speech provider via the API"
+      ],
+      "reason": "REQ-434 leaves this open. A provider means the api application is also touched; browser speech keeps the work in web only.",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    },
+    {
+      "id": "q2",
+      "type": "single_choice",
+      "text": "Which 2D avatar animation assets should the interviewer use?",
+      "options": [
+        "Create simple placeholder animations in the project",
+        "Product owner supplies the assets"
+      ],
+      "reason": "REQ-434 says '2D animation assets' without naming them, and the idle, speaking and listening states depend on them.",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    },
+    {
+      "id": "q3",
+      "type": "single_choice",
+      "text": "When TTS is unavailable on a device, what does the replay/mute control show?",
+      "options": [
+        "Hide the audio controls; text only",
+        "Show the controls disabled with a short message"
+      ],
+      "reason": "REQ-434 requires the question text to stay visible but does not say what happens to the audio controls.",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    }
+  ]
+}
