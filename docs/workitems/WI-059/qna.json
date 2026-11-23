@@ -2,7 +2,7 @@
   "entity_type": "workItem",
   "entity_id": "WI-059",
   "assigned_to": "Pua6ezZowteUtW37dndRPa890B93",
-  "status": "pending",
+  "status": "completed",
   "questions": [
     {
       "id": "q1",
@@ -10,9 +10,10 @@
       "text": "How should a 'weak topic' be defined for the Strengths / weak topics list?",
       "reason": "REQ-436 lists this as an open question; the definition decides what the dashboard shows.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Any topic with an average score below 60% across completed interviews.",
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-23T04:08:29.000Z",
+      "other": null
     },
     {
       "id": "q2",
@@ -20,9 +21,10 @@
       "text": "How is the 'progress trend' calculated (for example, change between consecutive completed interviews, or a moving average over the last N)?",
       "reason": "REQ-436 lists this as an open question; it decides the trend data the API must return.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Calculate the score difference between the two most recent completed interviews. Show improvement, decline, or no change.",
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-23T04:08:29.000Z",
+      "other": null
     },
     {
       "id": "q3",
@@ -30,9 +32,10 @@
       "text": "How many completed sessions are needed before the average score is shown?",
       "reason": "REQ-436 lists this as an open question; it sets the threshold for the average score card.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "2 completed interviews before showing the average score.",
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-23T04:08:29.000Z",
+      "other": null
     }
   ]
 }
