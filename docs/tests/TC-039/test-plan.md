@@ -34,8 +34,10 @@ Test basis: REQ-434 acceptance criteria 1 to 8, and the WI-057 plan and Q&A deci
 2. Expected: the question is read aloud.
 3. Click Replay.
 4. Expected: the question is read aloud again.
-5. Click Mute while audio is playing, then Replay.
-6. Expected: audio stops on Mute; the replay control respects the mute state as designed.
+5. Click Mute while audio is playing.
+6. Expected: audio stops immediately and does not resume on its own.
+7. Click Replay.
+8. Expected: the question is read aloud again from the start.
 
 ### TC-039-S05 TTS unavailable: controls disabled with a message (WI-057 Q&A q3)
 1. Open the session page on a device or browser without `speechSynthesis` or without a voice.
