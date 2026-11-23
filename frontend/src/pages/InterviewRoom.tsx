@@ -6,10 +6,22 @@ import {
   getCurrentInterview,
   startInterview,
   submitAnswer,
+  type InterviewQuestion,
   type InterviewSession,
 } from "../api/interviewSession";
+import { InterviewAvatar } from "../components/InterviewAvatar";
+import { isSttSupported, startListening } from "../speech/stt";
+import { isTtsSupported, speak, stopSpeaking } from "../speech/tts";
 
 type Notice = { kind: "ok" | "error"; text: string };
+
+const NO_SPEECH_TEXT = "No speech was heard. Try again, or type your answer.";
+const NO_AUDIO_TEXT = "Audio is not available on this device. Read the question above.";
+
+/** Identifies the question on screen, so it is spoken once when it appears. */
+function questionKey(session: InterviewSession, current: InterviewQuestion): string {
+  return `${session.id}:${current.kind}:${current.main_number}:${current.text}`;
+}
 
 const LOAD_FAILED = "Something went wrong. Please try again.";
 const ENDED_TEXT: Record<string, string> = {
@@ -38,6 +50,13 @@ export function InterviewRoomPage() {
   const [now, setNow] = useState(() => Date.now());
   // The question whose time-up has already been sent, so the answer goes in once.
   const sentFor = useRef<string | null>(null);
+  const [muted, setMuted] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
+  const [recording, setRecording] = useState(false);
+  // Stops the current recording; null when none is running.
+  const stopRecording = useRef<(() => void) | null>(null);
+  const ttsAvailable = isTtsSupported();
+  const sttAvailable = isSttSupported();
 
   function show(result: InterviewSession | null) {
     setSession(result);
@@ -49,6 +68,11 @@ export function InterviewRoomPage() {
       .then(show)
       .catch((err) => setNotice({ kind: "error", text: errorText(err) }))
       .finally(() => setLoading(false));
+    // Stop audio and microphone when the candidate leaves the room.
+    return () => {
+      stopSpeaking();
+      stopRecording.current?.();
+    };
   }, []);
 
   const inProgress = session?.status === "in_progress";
@@ -71,8 +95,74 @@ export function InterviewRoomPage() {
     questionLeft > 0 &&
     questionLeft <= session.warning_seconds * 1000;
 
+  function speakCurrent(text: string) {
+    speak(text, {
+      onStart: () => setSpeaking(true),
+      onEnd: () => setSpeaking(false),
+      onError: (code) => {
+        setSpeaking(false);
+        // Cancelling speech on purpose also reports an error; only real failures are shown.
+        if (code !== "canceled" && code !== "interrupted") setNotice({ kind: "error", text: NO_AUDIO_TEXT });
+      },
+    });
+  }
+
+  // Each new question is spoken once, unless the candidate has muted audio.
+  const currentKey = session && current ? questionKey(session, current) : null;
+  useEffect(() => {
+    if (!currentKey || !current || !ttsAvailable || muted) return;
+    speakCurrent(current.text);
+    // Only a new question starts speech; the mute setting is read as it was then.
+  }, [currentKey]);
+
+  function replayQuestion() {
+    if (current) speakCurrent(current.text);
+  }
+
+  function toggleMute() {
+    if (!muted) {
+      stopSpeaking();
+      setSpeaking(false);
+    }
+    setMuted(!muted);
+  }
+
+  function toggleRecording() {
+    if (stopRecording.current) {
+      stopRecording.current();
+      return;
+    }
+    let heard = false;
+    let failed = false;
+    const stop = startListening({
+      onText: (text) => {
+        if (!text) return;
+        heard = true;
+        setDraft((draft) => (draft.trim() ? `${draft.trimEnd()} ${text}` : text));
+      },
+      onError: (message) => {
+        failed = true;
+        if (message) setNotice({ kind: "error", text: message });
+      },
+      onEnd: () => {
+        stopRecording.current = null;
+        setRecording(false);
+        if (!heard && !failed) setNotice({ kind: "error", text: NO_SPEECH_TEXT });
+      },
+    });
+    if (!stop) {
+      setNotice({ kind: "error", text: "Voice input is not available in this browser. Type your answer below." });
+      return;
+    }
+    setNotice(null);
+    stopRecording.current = stop;
+    setRecording(true);
+  }
+
   async function sendAnswer(text: string, action: "submit" | "end") {
     if (!session) return;
+    stopRecording.current?.();
+    stopSpeaking();
     setBusy(true);
     setNotice(null);
     try {
@@ -132,6 +222,11 @@ export function InterviewRoomPage() {
       <section className="card">
         <h1>Interview room</h1>
         {session && <p className="hint">{ENDED_TEXT[session.status] ?? "This interview has ended."}</p>}
+        {session?.status === "completed" && (
+          <p className="hint">
+            <Link to={`/interview/report/${session.id}`}>View your report</Link>
+          </p>
+        )}
         {notice && <Message notice={notice} />}
         <p className="hint">
           Your interview uses the role, type, difficulty and duration you set up.{" "}
@@ -162,6 +257,8 @@ export function InterviewRoomPage() {
 
       {notice && <Message notice={notice} />}
 
+      <InterviewAvatar state={recording ? "listening" : speaking ? "speaking" : "idle"} />
+
       {current && (
         <article className="question" aria-live="polite">
           <p className="hint">
@@ -177,10 +274,34 @@ export function InterviewRoomPage() {
             <p className="hint">Follow-up: uses the time left in the interview.</p>
           )}
           <p className="question-text">{current.text}</p>
+          <div className="audio-controls">
+            <button type="button" className="secondary" onClick={replayQuestion} disabled={!ttsAvailable}>
+              Replay question
+            </button>
+            <button
+              type="button"
+              className="secondary"
+              onClick={toggleMute}
+              disabled={!ttsAvailable}
+              aria-pressed={muted}
+            >
+              {muted ? "Unmute audio" : "Mute audio"}
+            </button>
+          </div>
+          {!ttsAvailable && <p className="hint">{NO_AUDIO_TEXT}</p>}
         </article>
       )}
 
       <form onSubmit={onSubmit} noValidate>
+        {sttAvailable ? (
+          <div className="actions">
+            <button type="button" className="secondary" onClick={toggleRecording} disabled={busy} aria-pressed={recording}>
+              {recording ? "Stop recording" : "Record answer"}
+            </button>
+          </div>
+        ) : (
+          <p className="hint">Voice input is not available in this browser. Type your answer below.</p>
+        )}
         <label>
           Your answer
           <textarea
