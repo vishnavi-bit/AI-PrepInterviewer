@@ -1,0 +1,42 @@
+{
+  "entity_type": "workItem",
+  "entity_id": "WI-056",
+  "assigned_to": "Pua6ezZowteUtW37dndRPa890B93",
+  "status": "pending",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "text",
+      "text": "How many questions are in a question plan, and how many follow-up questions are allowed per interview?",
+      "reason": "REQ-433 leaves the plan size and follow-up limit open. They set the session length, the progress display (Question n of N) and when the interview completes.",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    },
+    {
+      "id": "q2",
+      "type": "text",
+      "text": "How is the timer shown, and what happens when the time runs out while the candidate is answering?",
+      "reason": "REQ-433 leaves this open. It decides whether an unsubmitted answer is saved, discarded or auto-submitted, and how the session status is set (completed vs interrupted).",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    },
+    {
+      "id": "q3",
+      "type": "single_choice",
+      "text": "Is the question plan generated once at the start of the interview, or one question at a time as the interview goes on?",
+      "options": [
+        "Generated once at the start",
+        "Generated one question at a time"
+      ],
+      "reason": "REQ-433 leaves this open. It changes the API design: a single up-front generation call versus a per-question call that also decides follow-ups.",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    }
+  ]
+}
