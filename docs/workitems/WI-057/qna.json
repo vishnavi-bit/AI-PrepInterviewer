@@ -2,7 +2,7 @@
   "entity_type": "workItem",
   "entity_id": "WI-057",
   "assigned_to": "Pua6ezZowteUtW37dndRPa890B93",
-  "status": "pending",
+  "status": "completed",
   "questions": [
     {
       "id": "q1",
@@ -14,9 +14,10 @@
       ],
       "reason": "REQ-434 leaves this open. A provider means the api application is also touched; browser speech keeps the work in web only.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Browser speech only (web app)",
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-23T03:46:16.000Z",
+      "other": null
     },
     {
       "id": "q2",
@@ -28,9 +29,10 @@
       ],
       "reason": "REQ-434 says '2D animation assets' without naming them, and the idle, speaking and listening states depend on them.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Create simple placeholder animations in the project",
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-23T03:46:16.000Z",
+      "other": null
     },
     {
       "id": "q3",
@@ -42,9 +44,10 @@
       ],
       "reason": "REQ-434 requires the question text to stay visible but does not say what happens to the audio controls.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Show the controls disabled with a short message",
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-23T03:46:16.000Z",
+      "other": null
     }
   ]
 }
