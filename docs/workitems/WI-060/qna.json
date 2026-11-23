@@ -2,7 +2,7 @@
   "entity_type": "workItem",
   "entity_id": "WI-060",
   "assigned_to": "Pua6ezZowteUtW37dndRPa890B93",
-  "status": "pending",
+  "status": "completed",
   "questions": [
     {
       "id": "q1",
@@ -10,9 +10,10 @@
       "text": "What retention period applies to resumes, transcripts and reports before they are deleted?",
       "reason": "REQ-437 requires documented deletion rules but gives no durations. The deletion rules and the delete job cannot be implemented without them.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Resumes: 1 year after the candidate's last activity.\n\n\n\nTranscripts: 1 year after the interview date.\n\n\n\nReports: 1 year after the interview date.\n\n\n\nAutomatically delete after the retention period.\n\n\n\nAllow earlier deletion upon user request.",
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-23T04:34:14.000Z",
+      "other": null
     },
     {
       "id": "q2",
@@ -20,9 +21,10 @@
       "text": "Which logging tool or format should the backend use?",
       "reason": "REQ-437 open question. Needed to decide how logs are written and how secrets are redacted in them.",
       "required": false,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Use Pino structured logging in the backend.\n- Include timestamps, log levels and request IDs.\n- Log errors, warnings and important events.\n- Never log passwords, tokens or sensitive personal data.",
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-23T04:34:14.000Z",
+      "other": null
     },
     {
       "id": "q3",
@@ -30,9 +32,10 @@
       "text": "Is the hosting target decided, and is HTTPS terminated there?",
       "reason": "REQ-437 open question. The source says 'use HTTPS in deployment', which affects secure cookie and CORS settings.",
       "required": false,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Hosting target is not decided yet.\n- Keep deployment hosting-independent.\n- Require HTTPS in production.\n- HTTPS termination will be handled by the hosting platform or reverse proxy.",
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-23T04:34:14.000Z",
+      "other": null
     }
   ]
 }
