@@ -9,9 +9,7 @@ from docx import Document
 from fastapi.testclient import TestClient
 
 from app.db.connection import DatabaseError
-from app.jobs.purge_resumes import purge_due
-from app.timeutil import utc_now
-from tests.conftest import login, register
+from tests.conftest import PASSWORD, delete_verified, login, register
 
 DOCX_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
@@ -152,8 +150,12 @@ def test_failed_replace_keeps_the_old_resume(client: TestClient, app, settings, 
         raise DatabaseError("simulated failure")
 
     monkeypatch.setattr("app.services.resume_service.resumes_repo.upsert_resume", broken_upsert)
-    with pytest.raises(DatabaseError):
-        upload(client, make_docx("replacement"), "new.docx")
+    # The candidate gets a generic error with no internal detail; the request ID is in the header (WI-060).
+    response = upload(client, make_docx("replacement"), "new.docx")
+    assert response.status_code == 500
+    assert response.json() == {"detail": "Something went wrong. Please try again."}
+    assert "simulated failure" not in response.text
+    assert response.headers["X-Request-ID"]
 
     assert client.get("/api/resume").json() == before
     files = stored_files(settings)
@@ -171,7 +173,7 @@ def test_another_users_resume_is_not_visible_or_replaceable(app, settings) -> No
         # Grace has no resume of her own, so she cannot see Ada's.
         assert grace_client.get("/api/resume").status_code == 404
         # Nothing in the API takes another user's id, so Grace cannot delete Ada's either.
-        assert grace_client.delete("/api/resume").status_code == 404
+        assert delete_verified(grace_client, "/api/resume").status_code == 404
 
         # Grace uploading creates her own resume and leaves Ada's file untouched.
         assert upload(grace_client, make_docx("Grace's resume"), "grace.docx").status_code == 200
@@ -184,34 +186,41 @@ def test_another_users_resume_is_not_visible_or_replaceable(app, settings) -> No
 
 def test_resume_routes_require_sign_in(client: TestClient) -> None:
     assert client.get("/api/resume").status_code == 401
-    assert client.delete("/api/resume").status_code == 401
+    assert delete_verified(client, "/api/resume").status_code == 401
     assert upload(client, make_pdf("hello")).status_code == 401
 
 
-def test_delete_hides_the_resume_and_purge_removes_file_and_text(app, settings) -> None:
+def test_delete_removes_the_file_and_text_at_once(app, settings) -> None:
     with TestClient(app) as client:
         sign_in(client)
         upload(client, make_pdf("to be deleted"), "gone.pdf")
+        assert len(stored_files(settings)) == 1
 
-        assert client.delete("/api/resume").status_code == 204
+        assert delete_verified(client, "/api/resume").status_code == 204
         assert client.get("/api/resume").status_code == 404
-        assert client.delete("/api/resume").status_code == 404  # already requested
+        assert delete_verified(client, "/api/resume").status_code == 404  # nothing left to delete
 
-    # Hidden at once, but the file is kept until the retention period has passed.
-    assert len(stored_files(settings)) == 1
-    assert purge_due(app.state.db, app.state.resume_store, now=utc_now() + timedelta(days=1)) == 0
-    assert len(stored_files(settings)) == 1
-
-    assert purge_due(app.state.db, app.state.resume_store, now=utc_now() + timedelta(days=31)) == 1
     assert stored_files(settings) == []
     assert app.state.db.execute("SELECT id FROM resumes") == []
 
 
-def test_upload_after_delete_request_creates_a_fresh_resume(app, settings) -> None:
+def test_delete_needs_the_current_password_and_deletes_nothing_without_it(app, settings) -> None:
+    with TestClient(app) as client:
+        sign_in(client)
+        upload(client, make_pdf("keep me"), "keep.pdf")
+
+        response = delete_verified(client, "/api/resume", password="not-the-password")
+
+        assert response.status_code == 403
+        assert client.get("/api/resume").status_code == 200
+    assert len(stored_files(settings)) == 1
+
+
+def test_upload_after_delete_creates_a_fresh_resume(app, settings) -> None:
     with TestClient(app) as client:
         sign_in(client)
         upload(client, make_pdf("first"), "first.pdf")
-        client.delete("/api/resume")
+        delete_verified(client, "/api/resume")
 
         assert upload(client, make_docx("second"), "second.docx").status_code == 200
         assert client.get("/api/resume").json()["original_filename"] == "second.docx"

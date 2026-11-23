@@ -1,7 +1,9 @@
 import { Link, Navigate, Route, Routes } from "react-router-dom";
 import { RequireAuth } from "./components/RequireAuth";
 import { useAuth } from "./context/AuthContext";
+import { DashboardPage } from "./pages/Dashboard";
 import { InterviewConfigurationPage } from "./pages/InterviewConfiguration";
+import { InterviewReportPage } from "./pages/InterviewReport";
 import { InterviewRoomPage } from "./pages/InterviewRoom";
 import { Login } from "./pages/Login";
 import { Profile } from "./pages/Profile";
@@ -25,6 +27,7 @@ export default function App() {
               <Link to="/roles">Job roles</Link>
               <Link to="/interview">Interview setup</Link>
               <Link to="/interview/room">Interview room</Link>
+              <Link to="/dashboard">Dashboard</Link>
               <Link to="/profile">Profile</Link>
             </>
           ) : (
@@ -78,6 +81,22 @@ export default function App() {
             element={
               <RequireAuth>
                 <InterviewRoomPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <RequireAuth>
+                <DashboardPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/interview/report/:sessionId"
+            element={
+              <RequireAuth>
+                <InterviewReportPage />
               </RequireAuth>
             }
           />

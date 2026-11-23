@@ -5,10 +5,9 @@ from datetime import timedelta
 
 from fastapi.testclient import TestClient
 
-from app.jobs.purge_resumes import purge_due
 from app.services.gemini_client import AnalysisUnavailable
 from app.services.role_recommendation_service import GENERATION_FAILED, NOT_ENOUGH_INFORMATION
-from app.timeutil import utc_now
+from tests.conftest import delete_verified
 from tests.test_resume_analysis import FakeGemini, gemini_answer
 from tests.test_resumes import make_pdf, sign_in, upload
 
@@ -214,14 +213,13 @@ def test_replacing_the_resume_makes_the_old_roles_unavailable(app, client: TestC
     assert response.json()["selected_role"] is None  # the old selection is not an option any more
 
 
-def test_purging_the_resume_removes_the_stored_roles(app, client: TestClient) -> None:
+def test_deleting_the_resume_removes_the_stored_roles_at_once(app, client: TestClient) -> None:
     analyzed(app, client)
     app.state.gemini = ScriptedGemini(roles_json())
     client.get("/api/role-recommendations")
     client.post("/api/role-recommendations/selection", json={"position": 2})
-    client.delete("/api/resume")
+    delete_verified(client, "/api/resume")
 
-    assert purge_due(app.state.db, app.state.resume_store, now=utc_now() + timedelta(days=31)) == 1
     assert app.state.db.execute("SELECT user_id FROM role_recommendations") == []
 
 

@@ -8,10 +8,9 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.config import Settings
-from app.jobs.purge_resumes import purge_due
 from app.services.gemini_client import AnalysisUnavailable, GeminiClient
 from app.services.resume_analysis_service import ANALYSIS_FAILED_MESSAGE, CORRECTIONS_INVALID_MESSAGE
-from app.timeutil import utc_now
+from tests.conftest import delete_verified
 from tests.test_resumes import make_pdf, sign_in, upload
 
 RESUME_TEXT = "Ada Lovelace. Skills: Python and SQL. Education: BSc Mathematics, University of London, 2015."
@@ -162,14 +161,13 @@ def test_replacing_the_resume_makes_the_old_analysis_unavailable(app, client: Te
     assert app.state.db.execute("SELECT user_id FROM resume_analyses") == []
 
 
-def test_purge_removes_the_analysis_with_the_resume(app, client: TestClient) -> None:
+def test_deleting_the_resume_removes_the_analysis_at_once(app, client: TestClient) -> None:
     sign_in(client)
     upload(client, make_pdf(RESUME_TEXT), "cv.pdf")
     app.state.gemini = FakeGemini(gemini_answer(skills=["Python"]))
     analyze(client)
-    client.delete("/api/resume")
+    delete_verified(client, "/api/resume")
 
-    assert purge_due(app.state.db, app.state.resume_store, now=utc_now() + timedelta(days=31)) == 1
     assert app.state.db.execute("SELECT user_id FROM resume_analyses") == []
 
 

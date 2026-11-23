@@ -57,3 +57,11 @@ export function endInterview(sessionId: string, answer: string) {
     body: JSON.stringify({ answer }),
   });
 }
+
+/** Deletes a finished interview with its answers and report. Requires the candidate's current password (WI-060). */
+export function deleteInterview(sessionId: string, password: string) {
+  return api<void>(`/api/interview-sessions/${sessionId}`, {
+    method: "DELETE",
+    body: JSON.stringify({ password }),
+  });
+}

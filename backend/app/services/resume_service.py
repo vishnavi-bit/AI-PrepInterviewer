@@ -1,4 +1,4 @@
-"""Resume rules: validation, one resume per user, replace order, and delete-marking.
+"""Resume rules: validation, one resume per user, replace order, and immediate deletion (WI-060).
 
 Every function takes the user id of the signed-in user. Nothing here reads a user id from the request.
 """
@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
-from app.db import analyses_repo, resumes_repo
+from app.db import activity_repo, analyses_repo, resumes_repo, role_recommendations_repo
 from app.db.connection import Database, DatabaseError
 from app.services.text_extraction import UnreadableResume, extract_text
 from app.storage.resume_store import ResumeFileStore
@@ -94,14 +94,23 @@ def upload_resume(
     if previous is not None:
         store.delete(previous["storage_key"])
 
+    activity_repo.touch(db, user_id, iso(utc_now()))
     current = resumes_repo.get_active_for_user(db, user_id)
     assert current is not None
     return current
 
 
-def request_delete(db: Database, *, user_id: str) -> bool:
-    """Hide the resume now; the purge job removes the file and text after the retention period."""
-    if resumes_repo.get_active_for_user(db, user_id) is None:
+def delete_resume(db: Database, store: ResumeFileStore, *, user_id: str) -> bool:
+    """Deletes the resume at once (WI-060): the file, the AI analysis, the role recommendations and the row.
+
+    The file goes first, so a failure never leaves a row pointing at nothing. Returns False when there is no resume.
+    """
+    row = resumes_repo.get_any_for_user(db, user_id)
+    if row is None:
         return False
-    resumes_repo.mark_delete_requested(db, user_id, iso(utc_now()))
+    store.delete(row["storage_key"])
+    analyses_repo.delete_for_user(db, user_id)
+    role_recommendations_repo.delete_for_user(db, user_id)
+    resumes_repo.delete_row(db, row["id"])
+    activity_repo.touch(db, user_id, iso(utc_now()))
     return True

@@ -10,7 +10,7 @@ from app.auth import sessions
 from app.auth.deps import CurrentUser, current_session_hash
 from app.auth.schemas import UserOut, to_user_out
 from app.auth.security import hash_password, verify_password
-from app.db import users
+from app.db import activity_repo, users
 from app.timeutil import iso, utc_now
 
 router = APIRouter(prefix="/api/profile", tags=["profile"])
@@ -68,6 +68,7 @@ def update_profile(body: ProfileUpdateIn, user: CurrentUser, request: Request) -
     name = body.name if "name" in body.model_fields_set else user["name"]
     target_role = body.target_role if "target_role" in body.model_fields_set else user["target_role"]
     users.update_profile(db, user["id"], name=name, target_role=target_role, now=iso(utc_now()))
+    activity_repo.touch(db, user["id"], iso(utc_now()))
     updated = users.get_user_by_id(db, user["id"])
     assert updated is not None
     return to_user_out(updated)
@@ -80,6 +81,7 @@ def change_password(body: PasswordChangeIn, user: CurrentUser, request: Request)
     if stored_hash is None or not verify_password(stored_hash, body.current_password):
         raise HTTPException(status_code=400, detail="Current password is incorrect.")
     users.set_password_hash(db, user["id"], hash_password(body.new_password), iso(utc_now()))
+    activity_repo.touch(db, user["id"], iso(utc_now()))
     # Sign out every other device; this browser stays signed in.
     sessions.delete_other_sessions(db, user["id"], keep_token_hash=current_session_hash(request) or "")
     return Response(status_code=204)

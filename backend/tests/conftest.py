@@ -48,3 +48,8 @@ def register(client: TestClient, email: str = "ada@example.com", name: str = "Ad
 
 def login(client: TestClient, email: str = "ada@example.com", password: str = PASSWORD):
     return client.post("/api/auth/login", json={"email": email, "password": password})
+
+
+def delete_verified(client: TestClient, url: str, password: str = PASSWORD):
+    """A deletion request: the candidate re-enters their password (WI-060)."""
+    return client.request("DELETE", url, json={"password": password})

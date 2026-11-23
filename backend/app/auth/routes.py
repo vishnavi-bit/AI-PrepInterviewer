@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from datetime import timedelta
 
 from fastapi import APIRouter, HTTPException, Request, Response
@@ -9,11 +10,13 @@ from app.auth import sessions
 from app.auth.deps import current_session_hash
 from app.auth.schemas import LoginIn, RegisterIn, UserOut, to_user_out
 from app.auth.security import DUMMY_HASH, hash_password, hash_token, new_session_token, verify_password
-from app.db import users
+from app.db import activity_repo, users
 from app.db.connection import IntegrityError
+from app.logging_setup import get_logger, log_event
 from app.timeutil import iso, utc_now
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
+logger = get_logger("auth")
 
 INVALID_LOGIN = "Email or password is incorrect."
 DUPLICATE_EMAIL = "An account with this email already exists."
@@ -34,6 +37,8 @@ def register(body: RegisterIn, request: Request) -> UserOut:
         )
     except IntegrityError as exc:  # two registrations with the same email at the same time
         raise HTTPException(status_code=409, detail=DUPLICATE_EMAIL) from exc
+    activity_repo.touch(db, user["id"], iso(utc_now()))
+    log_event(logger, logging.INFO, "account_created", user_id=user["id"])
     return to_user_out(user)
 
 
@@ -44,6 +49,7 @@ def login(body: LoginIn, request: Request) -> JSONResponse:
     user = users.get_user_by_email(db, body.email.strip().lower())
     password_ok = verify_password(user["password_hash"] if user else DUMMY_HASH, body.password)
     if user is None or not password_ok:
+        log_event(logger, logging.WARNING, "sign_in_failed")  # no email or password in the log
         raise HTTPException(status_code=401, detail=INVALID_LOGIN)
 
     token, token_hash = new_session_token()
@@ -55,6 +61,8 @@ def login(body: LoginIn, request: Request) -> JSONResponse:
         now=iso(now),
         expires_at=iso(now + timedelta(days=settings.session_days)),
     )
+    activity_repo.touch(db, user["id"], iso(now))
+    log_event(logger, logging.INFO, "sign_in", user_id=user["id"])
     response = JSONResponse(content=to_user_out(user).model_dump())
     sessions.set_session_cookie(response, token, settings)
     return response

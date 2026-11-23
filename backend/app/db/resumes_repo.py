@@ -57,17 +57,11 @@ def upsert_resume(
     )
 
 
-def mark_delete_requested(db: Database, user_id: str, now: str) -> None:
-    db.execute(
-        "UPDATE resumes SET delete_requested_at = ? WHERE user_id = ? AND delete_requested_at IS NULL",
-        (now, user_id),
-    )
-
-
-def list_delete_requested_before(db: Database, cutoff: str) -> list[dict[str, Any]]:
-    """For the purge job only; not user-facing, so it is not filtered by user id."""
+def list_for_inactive_users(db: Database, cutoff: str) -> list[dict[str, Any]]:
+    """Resumes whose candidate has been inactive since before the cutoff. For the retention job only."""
     return db.execute(
-        f"SELECT {METADATA_COLUMNS} FROM resumes WHERE delete_requested_at IS NOT NULL AND delete_requested_at < ?",
+        "SELECT r.id, r.user_id, r.storage_key FROM resumes r "
+        "JOIN user_activity a ON a.user_id = r.user_id WHERE a.last_activity_at < ?",
         (cutoff,),
     )
 

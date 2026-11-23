@@ -6,16 +6,20 @@ signed-in user, so another user's resume simply looks like "no resume" (404).
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from fastapi import APIRouter, File, HTTPException, Request, Response, UploadFile
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
+from app.auth import verification
 from app.auth.deps import CurrentUser
+from app.logging_setup import get_logger, log_event
 from app.services import resume_service
 from app.services.resume_service import ResumeRejected
 
 router = APIRouter(prefix="/api/resume", tags=["resume"])
+logger = get_logger("resume")
 
 
 class ResumeOut(BaseModel):
@@ -67,8 +71,18 @@ def get_resume(request: Request, user: CurrentUser) -> ResumeOut:
     return _to_out(row)
 
 
+class DeleteIn(BaseModel):
+    # The candidate's current password: deletion is verified, not just signed in (WI-060).
+    password: str = Field(min_length=1, max_length=256)
+
+
 @router.delete("", status_code=204)
-def delete_resume(request: Request, user: CurrentUser) -> Response:
-    if not resume_service.request_delete(request.app.state.db, user_id=user["id"]):
+def delete_resume(body: DeleteIn, request: Request, user: CurrentUser) -> Response:
+    db = request.app.state.db
+    if not verification.password_matches(db, user["id"], body.password):
+        log_event(logger, logging.WARNING, "resume_delete_refused", user_id=user["id"], reason="password")
+        raise HTTPException(status_code=403, detail="Enter your current password to delete your resume.")
+    if not resume_service.delete_resume(db, request.app.state.resume_store, user_id=user["id"]):
         raise HTTPException(status_code=404, detail="No resume uploaded.")
+    log_event(logger, logging.INFO, "resume_deleted", user_id=user["id"])
     return Response(status_code=204)

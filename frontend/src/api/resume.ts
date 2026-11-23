@@ -24,6 +24,7 @@ export function uploadResume(file: File) {
   return api<Resume>("/api/resume", { method: "POST", body: form });
 }
 
-export function deleteResume() {
-  return api<void>("/api/resume", { method: "DELETE" });
+/** Deletes the resume at once. The candidate's current password is required (WI-060). */
+export function deleteResume(password: string) {
+  return api<void>("/api/resume", { method: "DELETE", body: JSON.stringify({ password }) });
 }

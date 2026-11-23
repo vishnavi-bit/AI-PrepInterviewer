@@ -26,6 +26,8 @@ export function Resume() {
   const [file, setFile] = useState<File | null>(null);
   const [notice, setNotice] = useState<Notice | null>(null);
   const [busy, setBusy] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     getResume()
@@ -71,13 +73,16 @@ export function Resume() {
     }
   }
 
-  async function onDelete() {
+  async function onDelete(event: FormEvent) {
+    event.preventDefault();
     setBusy(true);
     setNotice(null);
     try {
-      await deleteResume();
+      await deleteResume(password);
       setResume(null);
-      setNotice({ kind: "ok", text: "Resume deleted." });
+      setConfirming(false);
+      setPassword("");
+      setNotice({ kind: "ok", text: "Resume deleted. Its file, AI analysis and role suggestions were removed." });
     } catch (err) {
       setNotice({ kind: "error", text: errorText(err) });
     } finally {
@@ -123,13 +128,48 @@ export function Resume() {
             <button type="submit" disabled={busy || !file}>
               {resume ? "Replace" : "Upload"}
             </button>
-            {resume && (
-              <button type="button" className="secondary" disabled={busy} onClick={() => void onDelete()}>
+            {resume && !confirming && (
+              <button type="button" className="secondary" disabled={busy} onClick={() => setConfirming(true)}>
                 Delete resume
               </button>
             )}
           </div>
         </form>
+
+        {resume && confirming && (
+          <form className="stack" onSubmit={onDelete} noValidate>
+            <p className="hint">
+              Deletion is immediate. The file, its AI analysis and its role suggestions are removed at once and cannot be
+              recovered. Enter your current password to confirm.
+            </p>
+            <label>
+              Current password
+              <input
+                type="password"
+                autoComplete="current-password"
+                value={password}
+                disabled={busy}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </label>
+            <div className="actions">
+              <button type="submit" disabled={busy || password.length === 0}>
+                {busy ? "Deleting…" : "Confirm delete"}
+              </button>
+              <button
+                type="button"
+                className="secondary"
+                disabled={busy}
+                onClick={() => {
+                  setConfirming(false);
+                  setPassword("");
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
       </section>
 
       {/* Keyed by upload time, so a replaced or new resume starts with its own analysis state. */}

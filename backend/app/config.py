@@ -27,6 +27,8 @@ class Settings:
     gemini_timeout_seconds: float = 30.0
     # Interview durations the candidate can choose, in minutes. Empty until the product owner sets them.
     interview_duration_options: tuple[int, ...] = ()
+    # "development" or "production". Production refuses to start without secure (HTTPS-only) cookies.
+    app_env: str = "development"
 
 
 def _parse_minutes(raw: str) -> tuple[int, ...]:
@@ -49,4 +51,5 @@ def load_settings() -> Settings:
         gemini_model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
         gemini_timeout_seconds=float(os.getenv("GEMINI_TIMEOUT_SECONDS", "30")),
         interview_duration_options=_parse_minutes(os.getenv("INTERVIEW_DURATION_OPTIONS_MINUTES", "")),
+        app_env=os.getenv("APP_ENV", "development").strip().lower(),
     )

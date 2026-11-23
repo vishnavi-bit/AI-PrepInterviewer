@@ -38,6 +38,15 @@ def get_latest_for_user(db: Database, user_id: str) -> dict[str, Any] | None:
     return rows[0] if rows else None
 
 
+def list_completed_for_user(db: Database, user_id: str) -> list[dict[str, Any]]:
+    """The candidate's completed interviews, most recent first."""
+    return db.execute(
+        f"SELECT {SESSION_COLUMNS} FROM interview_sessions WHERE user_id = ? AND status = 'completed' "
+        "ORDER BY started_at DESC",
+        (user_id,),
+    )
+
+
 def create_session(db: Database, row: dict[str, Any]) -> None:
     db.execute(
         "INSERT INTO interview_sessions (id, user_id, status, role, interview_type, difficulty, duration_minutes, "
@@ -64,11 +73,29 @@ def close_session(db: Database, session_id: str, *, status: str, ended_at: str) 
     )
 
 
-def list_questions(db: Database, session_id: str) -> list[dict[str, Any]]:
+def list_questions(db: Database, session_id: str, user_id: str) -> list[dict[str, Any]]:
+    """The session's questions, only when the session belongs to the user (WI-060: ownership in the query)."""
+    columns = ", ".join(f"a.{column.strip()}" for column in QUESTION_COLUMNS.split(","))
     return db.execute(
-        f"SELECT {QUESTION_COLUMNS} FROM interview_answers WHERE session_id = ? ORDER BY seq",
-        (session_id,),
+        f"SELECT {columns} FROM interview_answers a JOIN interview_sessions s ON s.id = a.session_id "
+        "WHERE a.session_id = ? AND s.user_id = ? ORDER BY a.seq",
+        (session_id, user_id),
     )
+
+
+def list_started_before(db: Database, cutoff: str) -> list[dict[str, Any]]:
+    """Interview sessions whose interview date is before the cutoff. For the retention job only."""
+    return db.execute("SELECT id, user_id FROM interview_sessions WHERE started_at < ?", (cutoff,))
+
+
+def delete_session_data(db: Database, session_id: str) -> None:
+    """Removes one session with its answers and report. Explicit, so it does not depend on foreign-key cascades.
+
+    Callers check ownership first. The order is children before the session row.
+    """
+    db.execute("DELETE FROM interview_answers WHERE session_id = ?", (session_id,))
+    db.execute("DELETE FROM interview_reports WHERE session_id = ?", (session_id,))
+    db.execute("DELETE FROM interview_sessions WHERE id = ?", (session_id,))
 
 
 def add_question(

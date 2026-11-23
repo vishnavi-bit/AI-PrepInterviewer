@@ -13,6 +13,7 @@ import uuid
 from datetime import datetime, timedelta
 from typing import Any
 
+from app.db import activity_repo
 from app.db import interview_sessions_repo as repo
 from app.db import interview_settings_repo, resumes_repo, role_recommendations_repo
 from app.db.connection import Database
@@ -281,13 +282,13 @@ def _tick(db: Database, session: dict[str, Any], questions: list[dict[str, Any]]
         if open_question is not None:
             repo.record_answer(db, open_question["id"], text=None, state=UNANSWERED, answered_at=iso(now))
         _close(db, session, status=INTERRUPTED, now=now)
-        return repo.list_questions(db, session["id"])
+        return repo.list_questions(db, session["id"], session["user_id"])
 
     countdown = open_question["question_deadline_at"] if open_question else None
     if open_question is not None and open_question["kind"] == "main" and countdown and now >= _moment(countdown):
         repo.record_answer(db, open_question["id"], text=None, state=UNANSWERED, answered_at=countdown)
         _advance(db, session, questions, now)
-        return repo.list_questions(db, session["id"])
+        return repo.list_questions(db, session["id"], session["user_id"])
     return questions
 
 
@@ -325,12 +326,26 @@ def _view(session: dict[str, Any], questions: list[dict[str, Any]]) -> dict[str,
 # ---------- public functions ----------
 
 
+def delete_finished(db: Database, *, user_id: str, session_id: str) -> None:
+    """Deletes one of the candidate's finished interviews with its answers and report (WI-060).
+
+    The route checks the candidate's password first. An interview still in progress is refused: it must be ended first.
+    """
+    session = repo.get_for_user(db, session_id, user_id)
+    if session is None:
+        raise ResumeRejected(404, NOT_FOUND)
+    if session["status"] == IN_PROGRESS:
+        raise ResumeRejected(409, "Finish this interview before you delete it.")
+    repo.delete_session_data(db, session_id)
+    activity_repo.touch(db, user_id, iso(utc_now()))
+
+
 def current(db: Database, *, user_id: str) -> dict[str, Any] | None:
     """The candidate's most recent interview, with time limits applied. None when there is none yet."""
     session = repo.get_latest_for_user(db, user_id)
     if session is None:
         return None
-    questions = repo.list_questions(db, session["id"])
+    questions = repo.list_questions(db, session["id"], session["user_id"])
     if session["status"] == IN_PROGRESS:
         questions = _tick(db, session, questions, utc_now())
         session = repo.get_for_user(db, session["id"], user_id)
@@ -371,27 +386,29 @@ def start(db: Database, gemini: GeminiClient, *, user_id: str) -> dict[str, Any]
     session = repo.get_for_user(db, session_id, user_id)
     assert session is not None
     _ask_main(db, session, [], plan, 1, started)
-    return _view(session, repo.list_questions(db, session_id))
+    activity_repo.touch(db, user_id, iso(started))
+    return _view(session, repo.list_questions(db, session_id, user_id))
 
 
 def submit_answer(db: Database, gemini: GeminiClient, *, user_id: str, session_id: str, answer: str) -> dict[str, Any]:
     session = _in_progress_for(db, user_id, session_id)
     text = _clean(answer)
-    questions = repo.list_questions(db, session_id)
+    questions = repo.list_questions(db, session_id, user_id)
     open_question = _open_question(questions)
     if open_question is None:
         raise ResumeRejected(409, ALREADY_ENDED)
     _submit(db, gemini, session, questions, open_question, text, utc_now())
+    activity_repo.touch(db, user_id, iso(utc_now()))
     session = repo.get_for_user(db, session_id, user_id)
     assert session is not None
-    return _view(session, repo.list_questions(db, session_id))
+    return _view(session, repo.list_questions(db, session_id, user_id))
 
 
 def end_interview(db: Database, *, user_id: str, session_id: str, answer: str) -> dict[str, Any]:
     session = _in_progress_for(db, user_id, session_id)
     text = _clean(answer)
     now = utc_now()
-    questions = repo.list_questions(db, session_id)
+    questions = repo.list_questions(db, session_id, user_id)
     open_question = _open_question(questions)
     overall_over = now >= _moment(session["deadline_at"])
     if open_question is not None:
@@ -401,4 +418,4 @@ def end_interview(db: Database, *, user_id: str, session_id: str, answer: str) -
     _close(db, session, status=INTERRUPTED if overall_over else ENDED_EARLY, now=now)
     session = repo.get_for_user(db, session_id, user_id)
     assert session is not None
-    return _view(session, repo.list_questions(db, session_id))
+    return _view(session, repo.list_questions(db, session_id, user_id))
