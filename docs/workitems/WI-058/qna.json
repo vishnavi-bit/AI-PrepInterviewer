@@ -2,7 +2,7 @@
   "entity_type": "workItem",
   "entity_id": "WI-058",
   "assigned_to": "Pua6ezZowteUtW37dndRPa890B93",
-  "status": "pending",
+  "status": "completed",
   "questions": [
     {
       "id": "q1",
@@ -10,9 +10,10 @@
       "text": "Which category scores should each interview type (Technical, HR, Behavioral, Project-based) use? The source gives examples only (technical knowledge, communication, answer clarity and relevance, problem-solving).",
       "reason": "The category set defines the AI evaluation prompt, the output schema and the validation of the report, and acceptance criterion 4 depends on it.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Use interview-specific categories (Technical Knowledge, Communication, Problem-solving, Answer Clarity, Answer Relevance, etc.).",
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-23T04:07:24.000Z",
+      "other": null
     },
     {
       "id": "q2",
@@ -20,9 +21,10 @@
       "text": "What scoring rubric sits behind the overall score out of 100? For example, is it a weighted average of the category scores, with what weights, or a single holistic AI score?",
       "reason": "The rubric decides how the overall score is computed and checked, which is needed to validate AI output before it is saved.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Weighted average — Technical Knowledge 30%, Communication 25%, Problem-solving 25%, Answer Relevance 20%.",
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-23T04:07:24.000Z",
+      "other": null
     },
     {
       "id": "q3",
@@ -34,9 +36,10 @@
       ],
       "reason": "This decides whether the evaluation runs as part of session completion in the API or as a separate on-demand endpoint triggered from the web app.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Automatically when the interview ends",
+      "answered_by": "Pua6ezZowteUtW37dndRPa890B93",
+      "answered_at": "2026-11-23T04:07:24.000Z",
+      "other": null
     }
   ]
 }
