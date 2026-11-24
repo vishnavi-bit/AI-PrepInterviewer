@@ -3,10 +3,14 @@ import { createApp } from './app';
 import { routes } from '../glue/routes';
 import { middleware } from '../glue/middleware';
 import { providers } from '../glue/providers';
+import { getDb } from '../db/provider';
+import { migrate } from '../db/migrate';
+import { migrations } from '../db/migrations';
 
-// Starts the app on PORT (default 3000). Pass 0 to get a free port (tests).
-export function start(port: number = Number(process.env.PORT ?? 3000)): Promise<Server> {
+// Starts the app on PORT (default 3000). Pass 0 to get a free port (tests). Migrations run before the server listens.
+export async function start(port: number = Number(process.env.PORT ?? 3000)): Promise<Server> {
   const app = createApp({ routes, middleware, providers } as any);
+  await migrate(getDb(app), migrations);
   return new Promise((resolve, reject) => {
     // Express 5 passes a listen error to the callback (Express 4 only emitted it): reject instead of resolving.
     const server = app.listen(port, (err?: Error) => (err ? reject(err) : resolve(server)));

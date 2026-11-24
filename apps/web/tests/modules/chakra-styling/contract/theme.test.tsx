@@ -30,6 +30,6 @@ describe('styling contract', () => {
 
   it('the provider renders its children inside the merged theme', () => {
     render(<ChakraAppProvider entries={[{ id: 'x', tokens: chakraTokens }]}><Probe /></ChakraAppProvider>);
-    expect(screen.getByTestId('probe').textContent).toBe('#2d79ff|system-ui, sans-serif|no-accent');
+    expect(screen.getByTestId('probe').textContent).toBe("#6470F5|'Geist', 'Manrope', system-ui, sans-serif|no-accent");
   });
 });

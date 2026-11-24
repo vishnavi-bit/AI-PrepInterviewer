@@ -14,10 +14,19 @@
 node_modules/
 frontend/dist/
 backend/.venv/
+archive/frontend/dist/
+archive/backend/.venv/
 __pycache__/
 .pytest_cache/
 
 # Local data and uploads (never commit)
 backend/data/
 backend/uploads/
+archive/backend/data/
+archive/backend/uploads/
 *.db
+
+# Uploaded resumes and local API data (never commit)
+apps/api/uploads/
+apps/api/data/
+apps/web/dist/

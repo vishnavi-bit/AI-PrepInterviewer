@@ -1,0 +1,65 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run API",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": {
+        "cwd": "${workspaceFolder}/apps/api",
+        "env": {
+          "PORT": "3000"
+        }
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "api-dev",
+        "pattern": { "regexp": "^(.*)$", "message": 1 },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^> api@",
+          "endsPattern": "API listening on|API failed to start"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "dev-servers",
+        "clear": true,
+        "close": false,
+        "focus": false,
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "Run Web",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": {
+        "cwd": "${workspaceFolder}/apps/web",
+        "env": {
+          "API_PROXY_TARGET": "http://localhost:3000/api"
+        }
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "web-dev",
+        "pattern": { "regexp": "^(.*)$", "message": 1 },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^> web@",
+          "endsPattern": "ready in"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "dev-servers",
+        "clear": true,
+        "close": false,
+        "focus": false,
+        "showReuseMessage": false
+      }
+    }
+  ]
+}

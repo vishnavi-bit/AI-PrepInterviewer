@@ -1,0 +1,9 @@
+{
+  "apps": [
+    {
+      "name": "ai-prep-interviewer",
+      "title": "AI PrepInterviewer",
+      "platform": "desktop"
+    }
+  ]
+}

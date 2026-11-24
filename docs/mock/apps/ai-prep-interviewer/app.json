@@ -1,0 +1,14 @@
+{
+  "name": "ai-prep-interviewer",
+  "title": "AI PrepInterviewer",
+  "spec": "docs/project/context.md",
+  "walkthroughs": [
+    {
+      "id": "candidate-journey",
+      "title": "Candidate journey: sign-up to a saved report",
+      "description": "One candidate goes from sign-up through resume analysis, role choice and a two-question mock interview to a saved report, the dashboard and history. Sample data only.",
+      "sequenceFile": "sequences/candidate-journey.json",
+      "seedData": "mock-app/mock-data/seeds/candidate-journey.json"
+    }
+  ]
+}

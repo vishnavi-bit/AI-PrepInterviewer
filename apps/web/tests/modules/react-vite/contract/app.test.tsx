@@ -26,9 +26,9 @@ describe('app shell contract', () => {
     expect(container.firstChild).toBe(outer);
   });
 
-  it('works with the scaffold glue as it is (no modules registered yet: the not-found page)', () => {
+  it('works with the app glue as it is (the landing page is registered at /)', () => {
     render(<App Router={at('/')} />);
-    expect(screen.getByText('Page not found')).toBeTruthy();
+    expect(screen.getByText(/Turn Your Resume into Interview Confidence/)).toBeTruthy();
   });
 
   it('a crashing page shows a generic message, never the error, and the shell survives', () => {

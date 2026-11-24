@@ -1,0 +1,54 @@
+{
+  "_sample": "Sample data only. Names, ids, dates, scores and numbers are invented. The question plan has two questions for this walkthrough; the spec does not set a number (REQ-433).",
+  "profile": {
+    "name": "Asha Rao",
+    "email": "asha.rao@example.com"
+  },
+  "resume": {
+    "fileName": "asha_rao_resume.pdf",
+    "status": "none",
+    "skills": ["Python", "FastAPI", "SQL", "Git"],
+    "education": "B.Tech, Computer Science (sample)",
+    "projects": "Resume screening tool (sample)",
+    "experience": "Backend intern (sample)",
+    "certifications": "Python basics course (sample)"
+  },
+  "roles": {
+    "selected": "",
+    "list": [
+      { "title": "Python Developer", "why": "Python and FastAPI appear in your skills and project (sample)." },
+      { "title": "Backend Developer", "why": "SQL and an API project point to backend work (sample)." }
+    ]
+  },
+  "interview": {
+    "type": "Technical",
+    "difficulty": "Medium",
+    "duration": "30 minutes",
+    "status": "not started",
+    "avatar": "idle",
+    "questionNo": 1,
+    "questionTotal": 2,
+    "timeLeft": "29:40",
+    "isFollowUp": false,
+    "question": "Walk me through the FastAPI project on your resume.",
+    "followUp": "Which part of that project was hardest to test, and how did you handle it?",
+    "nextQuestion": "How would you design an endpoint that returns a candidate's saved reports only to their owner?",
+    "answersSaved": 0
+  },
+  "report": {
+    "overall": 72,
+    "technical": 70,
+    "communication": 75,
+    "clarity": 68,
+    "problemSolving": 74,
+    "strengths": ["Clear description of the project"],
+    "improve": ["Concrete example of how the code was tested"],
+    "suggestions": ["Practise a short example answer for each project on your resume"],
+    "recent": [{ "role": "Python Developer", "date": "2026-11-23", "score": 72 }]
+  },
+  "history": {
+    "completed": 0,
+    "lastScore": 0,
+    "recent": []
+  }
+}
