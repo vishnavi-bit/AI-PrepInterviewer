@@ -1,0 +1,213 @@
+{
+  "id": "candidate-journey",
+  "title": "Candidate journey: sign-up to a saved report",
+  "startStep": "landing",
+  "completionMessage": "You have seen the candidate journey: sign-up or log-in, resume upload and review, role choice, a two-question mock interview, a saved report, the dashboard and history. Where the spec is silent, the mock showed a Not defined alert (see the gap list). Scores and names are sample data.",
+  "steps": {
+    "landing": {
+      "user": "candidate",
+      "screen": "S01",
+      "proposedAction": "Click Create account",
+      "actions": {
+        "register": { "performedText": "clicked Create account", "nextStep": "register-form" },
+        "login": { "performedText": "clicked Log in", "nextStep": "login-form" }
+      }
+    },
+    "register-form": {
+      "user": "candidate",
+      "screen": "S02",
+      "proposedAction": "Fill in the details and click Create account",
+      "actions": {
+        "create-account": { "performedText": "created an account", "nextStep": "dashboard-new" }
+      }
+    },
+    "login-form": {
+      "user": "candidate",
+      "screen": "S03",
+      "proposedAction": "Enter your details and click Log in",
+      "actions": {
+        "log-in": { "performedText": "logged in", "nextStep": "dashboard-new" }
+      }
+    },
+    "dashboard-new": {
+      "user": "candidate",
+      "screen": "S04",
+      "proposedAction": "Click Upload resume",
+      "infoPanel": [{ "key": "history.completed", "label": "Completed interviews" }],
+      "actions": {
+        "open-resume": { "performedText": "opened resume upload", "nextStep": "resume-empty" }
+      }
+    },
+    "resume-empty": {
+      "user": "candidate",
+      "screen": "S05",
+      "proposedAction": "Click Upload",
+      "actions": {
+        "upload": {
+          "performedText": "uploaded your resume",
+          "nextStep": "resume-analysing",
+          "stateChange": { "resume.status": { "set": "analysing" } }
+        }
+      }
+    },
+    "resume-analysing": {
+      "user": "candidate",
+      "screen": "S05",
+      "proposedAction": "Wait for the analysis to finish",
+      "notDefined": "What the candidate sees if Gemini is unavailable during the analysis is not defined (REQ-430 open question). This walkthrough shows the success path only.",
+      "performedText": "waited for the analysis",
+      "stateChange": { "resume.status": { "set": "analysed" } },
+      "nextStep": "resume-review"
+    },
+    "resume-review": {
+      "user": "candidate",
+      "screen": "S05",
+      "proposedAction": "Check the extracted information and click Confirm",
+      "actions": {
+        "confirm": { "performedText": "confirmed the extracted information", "nextStep": "roles" }
+      }
+    },
+    "roles": {
+      "user": "candidate",
+      "screen": "S06",
+      "proposedAction": "Choose a role and click Choose this role",
+      "actions": {
+        "choose-role": {
+          "performedText": "chose the Python Developer role",
+          "nextStep": "interview-config",
+          "stateChange": { "roles.selected": { "set": "Python Developer" } }
+        }
+      }
+    },
+    "interview-config": {
+      "user": "candidate",
+      "screen": "S07",
+      "proposedAction": "Review the settings and click Start interview",
+      "infoPanel": [
+        { "key": "roles.selected", "label": "Role" },
+        { "key": "interview.duration", "label": "Duration" }
+      ],
+      "actions": {
+        "start-interview": {
+          "performedText": "started the interview",
+          "nextStep": "room-q1",
+          "stateChange": {
+            "interview.status": { "set": "in progress" },
+            "interview.avatar": { "set": "speaking" }
+          }
+        }
+      }
+    },
+    "room-q1": {
+      "user": "candidate",
+      "screen": "S08",
+      "proposedAction": "Answer question 1 and click Submit answer",
+      "infoPanel": [{ "key": "interview.answersSaved", "label": "Answers saved" }],
+      "actions": {
+        "submit-answer": {
+          "performedText": "submitted an answer to question 1",
+          "nextStep": "room-followup",
+          "stateChange": {
+            "interview.answersSaved": 1,
+            "interview.isFollowUp": { "set": true },
+            "interview.question": { "copy": "interview.followUp" },
+            "interview.avatar": { "set": "speaking" }
+          }
+        }
+      }
+    },
+    "room-followup": {
+      "user": "candidate",
+      "screen": "S08",
+      "proposedAction": "Answer the follow-up and click Submit answer",
+      "infoPanel": [{ "key": "interview.answersSaved", "label": "Answers saved" }],
+      "actions": {
+        "submit-answer": {
+          "performedText": "answered the follow-up question",
+          "nextStep": "room-q2",
+          "stateChange": {
+            "interview.answersSaved": 1,
+            "interview.isFollowUp": { "set": false },
+            "interview.questionNo": 1,
+            "interview.question": { "copy": "interview.nextQuestion" }
+          }
+        }
+      }
+    },
+    "room-q2": {
+      "user": "candidate",
+      "screen": "S08",
+      "proposedAction": "Answer question 2 and click Submit answer",
+      "infoPanel": [{ "key": "interview.answersSaved", "label": "Answers saved" }],
+      "actions": {
+        "submit-answer": {
+          "performedText": "submitted the last answer",
+          "nextStep": "interview-complete",
+          "stateChange": {
+            "interview.answersSaved": 1,
+            "interview.status": { "set": "completed" },
+            "interview.avatar": { "set": "idle" }
+          }
+        }
+      }
+    },
+    "interview-complete": {
+      "user": "candidate",
+      "screen": "S08",
+      "proposedAction": "Click View report",
+      "actions": {
+        "view-report": { "performedText": "opened the report", "nextStep": "result" }
+      }
+    },
+    "result": {
+      "user": "candidate",
+      "screen": "S09",
+      "proposedAction": "Read the report and click Back",
+      "actions": {
+        "back": {
+          "performedText": "read the report and went back",
+          "nextStep": "dashboard-after",
+          "stateChange": {
+            "history.completed": 1,
+            "history.lastScore": { "copy": "report.overall" },
+            "history.recent": { "copy": "report.recent" }
+          }
+        }
+      }
+    },
+    "dashboard-after": {
+      "user": "candidate",
+      "screen": "S04",
+      "proposedAction": "Click History in the tab bar",
+      "infoPanel": [{ "key": "history.completed", "label": "Completed interviews" }],
+      "actions": {
+        "goto-S10": { "performedText": "opened Interview History", "nextStep": "history" }
+      }
+    },
+    "history": {
+      "user": "candidate",
+      "screen": "S10",
+      "proposedAction": "Click Open to read the saved report, or Profile in the tab bar",
+      "actions": {
+        "open-report": { "performedText": "opened the saved report", "nextStep": "result-reopened" },
+        "goto-S11": { "performedText": "opened Profile and Settings", "nextStep": "profile" }
+      }
+    },
+    "result-reopened": {
+      "user": "candidate",
+      "screen": "S09",
+      "proposedAction": "Click Back to return to history",
+      "actions": {
+        "back": { "performedText": "went back from the saved report", "nextStep": "history" }
+      }
+    },
+    "profile": {
+      "user": "candidate",
+      "screen": "S11",
+      "proposedAction": "Click Log out",
+      "actions": {
+        "log-out": { "performedText": "logged out", "nextStep": null }
+      }
+    }
+  }
+}
